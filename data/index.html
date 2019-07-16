@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Hello World</h1>
+    <script>
+      // Global function to send a message to OS.js Application
+      function sendMessage() {
+        top.postMessage({
+          name: 'osjs/iframe:message',
+          params: [{
+            pid: parseInt(window.location.search.match(/pid=([^&]*)/)[1], 10),
+            wid: parseInt(window.location.search.match(/wid=([^&]*)/)[1], 10),
+            args: Array.prototype.slice.call(arguments)
+          }]
+        }, '*');
+      }
+
+      // Listen from messages from OS.js Application
+      window.addEventListener('message', function(ev) {
+        console.warn('Message from OS.js', ev.data);
+      });
+
+      // Send an example message
+      sendMessage('Ping');
+    </script>
+  </body>
+</html>
+

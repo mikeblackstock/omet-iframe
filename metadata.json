@@ -1,0 +1,15 @@
+{
+  "type": "application",
+  "name": "MyOmetApplication",
+  "category": null,
+  "server": null,
+  "title": {
+    "en_EN": "MyOmetApplication"
+  },
+  "description": {
+    "en_EN": "MyOmetApplication"
+  },
+  "files": [
+    "main.js"
+  ]
+}
