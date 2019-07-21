@@ -1,13 +1,13 @@
 {
   "type": "application",
-  "name": "MyOmetApplication",
-  "category": null,
+  "name": "MyApplication",
+  "category": "development",
   "server": null,
   "title": {
-    "en_EN": "MyOmetApplication"
+    "en_EN": "MyApplication"
   },
   "description": {
-    "en_EN": "MyOmetApplication"
+    "en_EN": "MyApplication"
   },
   "files": [
     "main.js"

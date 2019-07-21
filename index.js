@@ -9,7 +9,7 @@ const register = (core, args, options, metadata) => {
   // Create  a new Window instance
  proc.createWindow({
  	attributes: {
-    	closeable:false
+    	closeable:true
   	},
  
     title: metadata.title.en_EN,
