@@ -36,9 +36,9 @@ const register = (core, args, options, metadata) => {
     win.on('iframe:post', msg => iframe.contentWindow.postMessage(msg, window.location.href));
 
     // Listen for messages from iframe
+    // and send to server via websocket
     win.on('iframe:get', msg => {
-      console.warn('Message from Iframe', msg);
-      win.emit('iframe:post', 'Pong');
+      proc.send(msg);
     });
 
     $content.appendChild(iframe);
