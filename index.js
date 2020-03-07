@@ -18,8 +18,8 @@ const register = (core, args, options, metadata) => {
   })
   .on('destroy', () => proc.destroy())
   .render(($content, win) => {
-  	if (window.mobile === true)
-		win.maximize();  	
+//  	if (window.mobile === true)
+//		win.maximize();  	
     // Add our process and window id to iframe URL
     const suffix = `?pid=${proc.pid}&wid=${win.wid}`;
 
