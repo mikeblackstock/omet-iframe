@@ -1,13 +1,13 @@
 {
   "type": "application",
-  "name": "MyApplication",
+  "name": "IframeMenu",
   "category": "development",
   "server": null,
   "title": {
-    "en_EN": "MyApplication"
+    "en_EN": "IframeMenu"
   },
   "description": {
-    "en_EN": "MyApplication"
+    "en_EN": "IframeMenu"
   },
   "files": [
     "main.js"

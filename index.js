@@ -1,50 +1,97 @@
 import osjs from 'osjs';
 import {name as applicationName} from './metadata.json';
 
-// Our launcher
-const register = (core, args, options, metadata) => {
-  // Create a new Application instance
-  const proc = core.make('osjs/application', {args, options, metadata});
+import {
+  h,
+  app
+} from 'hyperapp';
 
-  // Create  a new Window instance
- proc.createWindow({
- 	attributes: {
-    	closeable:true
-  	},
- 
-    title: metadata.title.en_EN,
-    dimension: {width: 400, height:400},
-    position: 'center'
-  })
-  .on('destroy', () => proc.destroy())
-  .render(($content, win) => {
-//  	if (window.mobile === true)
-//		win.maximize();  	
-    // Add our process and window id to iframe URL
-    const suffix = `?pid=${proc.pid}&wid=${win.wid}`;
+import {
+  Box,
+  Menubar,
+  MenubarItem,
+  Iframe
+} from '@osjs/gui';
 
-    // Create an iframe
-    const iframe = document.createElement('iframe');
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.src = proc.resource('/data/index.html') + suffix;
-    iframe.setAttribute('border', '0');
 
-    // Bind window events to iframe
-    win.on('blur', () => iframe.contentWindow.blur());
-    win.on('focus', () => iframe.contentWindow.focus());
-    win.on('iframe:post', msg => iframe.contentWindow.postMessage(msg, window.location.href));
+const view = (core, proc, win) =>
+  (state, actions) => h(Box, {}, [
+  
+    h(Menubar, {}, [
+      h(MenubarItem, {
+        onclick: () => actions.update("Testing")
+      }, 'Test'),
+        
+  
+  	]),
+  
+  
+    h(Iframe, {
+      box: {grow: 1},
+      src: state.src,
+      id: state.id
+    })
+  ]);
 
-    // Listen for messages from iframe
-    // and send to server via websocket
-    win.on('iframe:get', msg => {
-      proc.send(msg);
-    });
+const openFile = async (core, proc, win, a, file) => {
+  const url = await core.make('osjs/vfs').url(file.path);
+  const ref = Object.assign({}, file, {url});
 
-    $content.appendChild(iframe);
-  });
-  return proc;
+  if (file.mime.match(/^text\/html?/)) {
+    a.setSource(ref.url);
+  }
+
+  win.setTitle(`${proc.metadata.title.en_EN} - ${file.filename}`);
+  proc.args.file = file;
 };
 
-// Creates the internal callback function when OS.js launches an application
-osjs.register(applicationName, register);
+
+osjs.register(applicationName, (core, args, options, metadata) => {
+  const title = core.make('osjs/locale')
+    .translatableFlat(metadata.title);
+
+  const proc = core.make('osjs/application', {
+    args,
+    options,
+    metadata
+  });
+
+  proc.createWindow({
+    id: 'HTMLViewerWindow',
+    title,
+    icon: proc.resource(metadata.icon),
+    dimension: {width: 400, height: 400}
+  })
+    .on('destroy', () => proc.destroy())
+    .on('render', (win) => win.focus())
+    .render(($content, win) => {
+		const suffix = `?pid=${proc.pid}&wid=${win.wid}`;    	
+      const a = app({
+      	id: 'log',
+        src: proc.resource('/data/index.html') +suffix
+      }, {
+        setSource: src => state => ({src}),
+        update:  () => (state, actions) => {
+        	document.getElementById(state.id).contentWindow.postMessage(Date.now(), window.location.href);
+    	}	
+
+      }, view(core, proc, win), $content);
+      
+      
+
+      if (args.file) {
+        openFile(core, proc, win, a, args.file);
+      }
+
+      win.on('drop', (ev, data) => {
+        if (data.isFile && data.mime) {
+          const found = metadata.mimes.find(m => (new RegExp(m)).test(data.mime));
+          if (found) {
+            openFile(core, proc, win, a, data);
+          }
+        }
+      });
+    });
+
+  return proc;
+});
